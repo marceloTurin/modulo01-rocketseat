@@ -5,8 +5,15 @@ const server = express();
 //req: dados da requisição
 //res: todas as informações de resposta da requisição
 
-server.get('/teste',(req, res) =>{
-  return res.json({message: 'Hello World'});
+//Query params = ?teste=1
+//Route params = /users/1
+//Request body = {"name" : "marcelo"}
+
+server.get('/users/:id',(req, res) =>{
+  const nome = req.query.nome;
+  const { id } = req.params;
+  //return res.json({message: `Hello ${nome}`});
+  return res.json({ message: `Buscando o usuário ${id}`});
 })
 
 server.listen(3000);
