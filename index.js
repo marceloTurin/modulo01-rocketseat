@@ -40,7 +40,8 @@ function checkUserInArray(req,res,next){
     return res.status(400).json({erro: 'User does not exists'})
   }
 
-  req.user = user;
+  req.user = user; // Todos os middlewares que usam o checkInArray tem acesso
+                   // a essa informação. 
 
   return next();
 }
@@ -63,7 +64,7 @@ server.get('/users/:index',checkUserInArray,(req, res) =>{
 server.post('/users',checkUserExists, (req,res)=>{
   const {name} = req.body;
 
-  users.push(name)
+  users.push(name);
 
   return res.json(users);
 })
