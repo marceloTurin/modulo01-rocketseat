@@ -9,11 +9,13 @@ const server = express();
 //Route params = /users/1
 //Request body = {"name" : "marcelo"}
 
-server.get('/users/:id',(req, res) =>{
+const users = ['Diego','Cláudio','Victor']
+
+server.get('/users/:index',(req, res) =>{
   const nome = req.query.nome;
-  const { id } = req.params;
+  const { index } = req.params;
   //return res.json({message: `Hello ${nome}`});
-  return res.json({ message: `Buscando o usuário ${id}`});
+  return res.json(users[index]);
 })
 
 server.listen(3000);
