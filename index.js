@@ -13,6 +13,38 @@ server.use(express.json()) //Permite que o express envie JSON no POST
 
 const users = ['Diego','Robson','Victor']
 
+//Middlewares: faz alguma coisa entre as requisições HTTP
+server.use((req,res,next)=>{
+  console.time('Request');
+  console.log(`Método: ${req.method}; URL: ${req.url}`)
+  
+  next();
+
+  console.timeEnd('Request');
+})
+
+//Verifica se tem a propriedade nome no corpo da requisição
+function checkUserExists(req,res,next){
+  if(!req.body.name){
+    return res.status(400).json({erro: 'User name is required'});
+  }
+
+  return next();
+}
+
+//Verifica se existe usuário no array
+function checkUserInArray(req,res,next){
+  const user = users[req.params.index]
+
+  if(!user){
+    return res.status(400).json({erro: 'User does not exists'})
+  }
+
+  req.user = user;
+
+  return next();
+}
+
 
 //Retorna todos os usuários
 server.get('/users',(req,res)=>{
@@ -20,15 +52,15 @@ server.get('/users',(req,res)=>{
 })
 
 //Pesquisa um usuário especifico
-server.get('/users/:index',(req, res) =>{
-  const nome = req.query.nome;
-  const { index } = req.params;
+server.get('/users/:index',checkUserInArray,(req, res) =>{
+  //const nome = req.query.nome;
+  //const { index } = req.params;
   //return res.json({message: `Hello ${nome}`});
-  return res.json(users[index]);
+  return res.json(req.user);
 })
 
 //Cadastra um usuário
-server.post('/users',(req,res)=>{
+server.post('/users',checkUserExists, (req,res)=>{
   const {name} = req.body;
 
   users.push(name)
@@ -37,7 +69,7 @@ server.post('/users',(req,res)=>{
 })
 
 //Edita um usuário
-server.put('/users/:index',(req,res)=>{
+server.put('/users/:index',checkUserExists,checkUserInArray, (req,res)=>{
   const { index } = req.params; // pega o index na url da rota
   const { name } = req.body; //pega o nome no corpo da requisição
 
@@ -46,8 +78,8 @@ server.put('/users/:index',(req,res)=>{
   return res.json(users)
 })
 
-//Altera um usuário
-server.delete('/users/:index',(req,res) =>{
+//Deleta um usuário
+server.delete('/users/:index',checkUserInArray,(req,res) =>{
   const {index} = req.params;
 
   users.splice(index,1); //Deleta o usuário do array
